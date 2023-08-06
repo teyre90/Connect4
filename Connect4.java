@@ -54,10 +54,13 @@ public class Connect4 extends Application{
     Stage stage;
 	Text text;
     
+	//Setup GUI Board
+	
     public void setupBoard() throws IOException{
 		
-		GridPane gridPane = new GridPane();
-	      
+		
+    	//Pane to contain buttons 
+    	GridPane gridPane = new GridPane();  
 		gridPane.setMinWidth(655);
 		gridPane.setMinHeight(575);
 	    gridPane.setPadding(new Insets(15,0,10,40));
@@ -66,8 +69,7 @@ public class Connect4 extends Application{
 		
 		String filePath="Connect4BlankBoard.png";		
 		 stream = new FileInputStream(filePath);
-	   Image image = new Image(stream);
-
+		 Image image = new Image(stream);
 	      imageView.setImage(image);
 	      
 	      //Setting the image view parameters
@@ -75,10 +77,13 @@ public class Connect4 extends Application{
 	      imageView.setY(10);
 	      imageView.setFitWidth(575);
 	      imageView.setPreserveRatio(true);
+	      
+	      //Add text to tell users whose turn it is
 	      text= new Text();
 	      text.setText("Red Turn");
 	      text.setY(550);
 	      text.setX(50);
+	      
 	      //Setting the Scene object
 	       root = new Group(imageView, gridPane, text);
 	       scene = new Scene(root, 595, 370);
@@ -86,7 +91,7 @@ public class Connect4 extends Application{
 	    
 	    
 	 
-
+	       //Add all buttons for code
 	    
 	    for (int i=5; i>=0;i--) {
 	    	for (int j=6; j>=0; j--) {
@@ -111,6 +116,7 @@ public class Connect4 extends Application{
     public void start (Stage stage) throws IOException{
 		
 
+    	//Set Scene and Show Stage
 	      setupBoard();
 	      stage.setTitle("Displaying Image");
 	      stage.setScene(scene);
@@ -135,6 +141,8 @@ public class Connect4 extends Application{
 		
 	}
 
+	
+	//Add Button For Given i and j values
 	public  void addButton( Group rootIn, GridPane gridPane, int iIn, int jIn) {
 		
 		String ijString =Integer.toString(iIn)+ Integer.toString(jIn); 
@@ -153,7 +161,7 @@ public class Connect4 extends Application{
 	}
 	
 	
-	
+	//Add counter in correct location
 	public  void fillSpace( Group rootIn, int iIn, int jIn) {
 		
 		 Circle redCircle = new Circle(53+jIn*80, 453-iIn*80, 36);          
@@ -165,15 +173,21 @@ public class Connect4 extends Application{
 		 yellowCircle.setStroke(Color.YELLOW);
 		
 		System.out.println(iIn +" "+ jIn);
+		
+		//Called when a button is clicked and it is red turn
 		if (player=="Red"){
 			
+			//Only add counter if it is a legal move and the game has not completed
 			if (newGame.checkLegalMove(iIn, jIn)&& !completeGame) {
 				rootIn.getChildren().add(redCircle); 
 				newGame.updateBoard(iIn, jIn,1);
+				//If the game now has a winner or board full, stop the game. Otherwise hand turn to yellow
 				if(newGame.checkForWinner()==1) stopGame(rootIn, player);
 				else if(newGame.checkForWinner()==2) stopGame(rootIn, "none");				
 				else {player="Yellow";
 				text.setText("Yellow Turn");
+				
+			//If singleplayer mode is on, call AI 	
 				if (singleplayer==true) {
 				
 					rootIn.getChildren().add(newGame.AIPlayer());
@@ -204,6 +218,7 @@ public class Connect4 extends Application{
 	}
 	
 	
+	//Runs when there is a winner or board is full
 	public void stopGame(Group rootIn, String playerIn){
 	 completeGame = true;
 	 Alert completionAlert = new Alert (AlertType.CONFIRMATION);
@@ -262,6 +277,7 @@ public class Connect4 extends Application{
 	private int board[][]= new int [6][7];
 	private int iMin[]= {0,0,0,0,0,0,0};
 	
+	//Setup array which will contain counters
 	Connect4Array(){
 		for (int i=0; i<6;i++) {
 			for (int j=0; j<7;j++) {
@@ -272,6 +288,7 @@ public class Connect4 extends Application{
 		
 	}
 	
+	//Prints board array - debugging purposes only
 	public void printBoard() {
 		System.out.println("\nUpdated Board \n");
 		for (int i=5; i>=0;i--) {
@@ -288,6 +305,7 @@ public class Connect4 extends Application{
 		
 	}
 	
+	//Updates array with latest move
 	public void updateBoard(int iIn, int jIn, int PlayerIn) {
 	//	System.out.println("Updated board called");
 		if (checkLegalMove(iIn,jIn)==true) {
@@ -398,6 +416,8 @@ public class Connect4 extends Application{
 		}
 	}
 	
+	//This method creates an AI move. Checks for vertical, then horizontal, then diagonal risks/rewards
+	//If nothing appropriate found, produce random legal move
 	public Circle AIPlayer() {
 		
 		boolean legal=false;
